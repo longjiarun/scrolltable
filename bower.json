@@ -1,0 +1,35 @@
+{
+  "name": "scrolltable",
+  "description": "scrolltable",
+  "main": "src/scrolltable.js",
+  "authors": [
+    "longjia <longjiarun@qq.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/longjiarun/scrolltable.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "scrolltable"
+  ],
+  "moduleType": [
+    "commonjs"
+  ],
+  "homepage": "",
+  "private": false,
+  "ignore": [
+    ".editorconfig",
+    ".gitignore",
+    ".npmignore",
+    "node_modules",
+    "bower_components",
+    "demo",
+    "build",
+    "test",
+    "server.js"
+  ],
+  "dependencies": {
+    "zepto": "^1.1.6"
+  }
+}
