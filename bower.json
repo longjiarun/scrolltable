@@ -1,5 +1,6 @@
 {
   "name": "scrolltable",
+  "version": "1.0.0",
   "description": "scrolltable",
   "main": "src/scrolltable.js",
   "authors": [
