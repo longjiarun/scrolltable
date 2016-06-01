@@ -1,0 +1,12 @@
+{
+  "status":{
+    "code":0
+  },
+  "result":{
+    "count":1000,
+    "result":[{
+      "name":"longjia",
+      "age":50
+    }]
+  }
+}

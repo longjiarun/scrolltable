@@ -5,12 +5,37 @@
     <meta name="viewport" content="width=device-width,user-scalable=no">
     <title>ScrollTable</title>
 </head>
+<style type="text/css">
+    li{
+        font-size: 32px;
+        padding: 20px 0;
+    }
+</style>
 <body>
-
+<div id="J_scrolltable">
+    <ul></ul>
+</div>
 <script type="text/javascript" src="../bower_components/zepto/zepto.js"></script>
 <script type="text/javascript" src="../dist/scrolltable.js"></script>
 <script type="text/javascript">
 
+new ScrollTable('#J_scrolltable',{
+    url : '/demo/data.json',
+    listSelector:'ul',
+    template : function(){
+        return '<li>' +Math.random()+ '</li>'
+    },
+    dataType:"json",
+    loadingTemplate:'<div class="juan-loading J_loading"><img src="//wd.geilicdn.com/bfeb0dd977e07a599cce2e0a5e7dbb68.gif"/></div>',
+    format : function(data){
+        return data.result
+    },
+    success : function(data){
+        if(data.status.code != 0){
+            return false;
+        }
+    }
+});
 </script>
 </body>
 </html>

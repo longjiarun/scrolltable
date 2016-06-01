@@ -25,6 +25,11 @@
         return !(element.offsetWidth <= 0 && element.offsetHeight <= 0)
     }
 
+    //获取页数
+    var getPages = function(total, pageSize) {
+        return Math.ceil(total / pageSize)
+    }
+
     /**
      * ## ScrollTable Constructor
      *
@@ -40,7 +45,7 @@
     function ScrollTable(element, options) {
         var self = this
 
-        self.options = $.extend({}, ScrollTable.prototype.defaults, options || {})
+        self.options = options = $.extend({}, ScrollTable.prototype.defaults, options || {})
 
         self.$element = $(element)
 
@@ -60,7 +65,6 @@
 
         handler()
     }
-
 
     (function() {
         /**
@@ -132,9 +136,61 @@
         this.pages = null
         this.data = []
 
-        //获取页数
-        this.getPages = function(total, pageSize) {
-            return Math.ceil(total / pageSize)
+        function setCompletedStatus(scrolltable) {
+            //加载完成
+            var $nodata = scrolltable.$nodata
+
+            scrolltable.$loading.hide()
+            $nodata && $nodata.remove()
+
+            scrolltable.$complete = $(scrolltable.options.completedTempalte).appendTo(scrolltable.$element)
+
+            scrolltable.completed = true
+            return scrolltable
+        }
+
+        function setNoDataStatus(scrolltable) {
+            //没有数据
+            var $complete = scrolltable.$complete
+
+            scrolltable.$loading.hide()
+            $complete && $complete.remove()
+
+            scrolltable.$nodata = $(scrolltable.options.noDataTemplate).appendTo(scrolltable.$element)
+
+            scrolltable.completed = true
+            return scrolltable
+        }
+
+        function getRenderHtml(scrolltable, data) {
+            var length, html = '',
+                tpl = scrolltable.options.template
+
+            if (data && (length = data.length)) {
+                for (var i = 0; i < length; i++) {
+                    html += tpl({
+                        data: data[i]
+                    })
+                }
+            }
+
+            return html
+        }
+
+        function remove(scrolltable, i, id){
+            var data = scrolltable.data,
+                $complete = scrolltable.$complete
+
+            data.splice(i, 1)
+
+            scrolltable.$element.find(scrolltable.options.itemSelector + id).remove()
+
+            if(data.length === 0){
+                //数据队列为空，优先显示 nodata 模板
+                $complete && $complete.remove()
+                scrolltable.completed && setNoDataStatus(scrolltable)
+            }
+            scrolltable.$container.trigger(SCROLL_EVENT)
         }
 
         /**
@@ -195,64 +251,23 @@
 
                     //如果是第一页且无数据
                     if (!data[options.countKey] && self.page == 1) {
-                        self.setNoDataStatus()
+                        setNoDataStatus(self)
                         return self
                     }
 
                     //分页数值计算一次
-                    self.pages == null && (self.pages = self.getPages(data[options.countKey] || 0, options.pageSize))
+                    self.pages == null && (self.pages = getPages(data[options.countKey] || 0, options.pageSize))
 
                     self.append(data[options.resultKey])
 
                     //判断数据是否加载完成
                     //有可能pages == 0 page == 1
-                    self.page >= self.pages ? self.setCompletedStatus() : self.$container.trigger(SCROLL_EVENT)
+                    self.page >= self.pages ? setCompletedStatus(self) : self.$container.trigger(SCROLL_EVENT)
                 })
             } else {
-                self.setCompletedStatus()
+                setCompletedStatus(self)
             }
             return self
-        }
-
-        this.setCompletedStatus = function() {
-            //加载完成
-            var $nodata = this.$nodata
-
-            this.$loading.hide()
-            $nodata && $nodata.remove()
-
-            this.$complete = $(this.options.completedTempalte).appendTo(this.$element)
-
-            this.completed = true
-            return this
-        }
-
-        this.setNoDataStatus = function() {
-            //没有数据
-            var $complete = this.$complete
-
-            this.$loading.hide()
-            $complete && $complete.remove()
-
-            this.$nodata = $(this.options.noDataTemplate).appendTo(this.$element)
-
-            this.completed = true
-            return this
-        }
-
-        function getRenderHtml(scrolltable, data) {
-            var length, html = '',
-                tpl = scrolltable.options.template
-
-            if (data && (length = data.length)) {
-                for (var i = 0; i < length; i++) {
-                    html += tpl({
-                        data: data[i]
-                    })
-                }
-            }
-
-            return html
         }
 
         /**
@@ -295,22 +310,6 @@
             return this
         }
 
-        function remove(scrolltable, i, id){
-            var data = scrolltable.data,
-                $complete = scrolltable.$complete
-
-            data.splice(i, 1)
-
-            scrolltable.$element.find(scrolltable.options.itemSelector + id).remove()
-
-            if(data.length === 0){
-                //数据队列为空，优先显示 nodata 模板
-                $complete && $complete.remove()
-                scrolltable.completed && scrolltable.setNoDataStatus()
-            }
-            scrolltable.$container.trigger(SCROLL_EVENT)
-        }
-
         /**
          * ## remove
          *
@@ -319,7 +318,7 @@
          * @param {Object} obj   被删除的数据
          * @return {instance} 当前实例
          */
-        this.remove = function(obj) {
+        /*this.remove = function(obj) {
             var data = this.data, length
 
             if (data && (length = data.length)) {
@@ -331,7 +330,7 @@
                 }
             }
             return this
-        }
+        }*/
 
         /**
          * ## getById
